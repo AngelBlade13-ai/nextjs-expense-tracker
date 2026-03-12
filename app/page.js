@@ -1,39 +1,46 @@
+"use client";
+
 import { currencyFormatter } from "@/lib/utils";
 
-import ExpenseCategoryItem from "@/Components/ExpenseCategoryitem";
+import ExpenseCategoryItem from "@/Components/ExpenseCategoryItem";
 
-const DUMMY_DATA =[
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const DUMMY_DATA = [
   {
-    id:1,
+    id: 1,
     title: "Entertainment",
     color: "#000",
-    amount: 500
+    total: 500,
   },
   {
-    id:2,
+    id: 2,
     title: "Gas",
     color: "#009",
-    amount: 200
+    total: 200,
   },
   {
-    id:3,
+    id: 3,
     title: "Food",
     color: "#081",
-    amount: 1200
+    total: 1200,
   },
   {
-    id:4,
+    id: 4,
     title: "Movies",
     color: "#007",
-    amount: 800
+    total: 800,
   },
   {
-    id:1,
+    id: 5,
     title: "Holiday",
     color: "#006",
-    amount: 2000,
+    total: 2000,
   },
-]
+];
 
 export default function Home() {
   return (
@@ -51,17 +58,37 @@ export default function Home() {
       <section className=" py-6 ">
         <h3 className=" text-2xl">My Expenses</h3>
         <div className=" flex flex-col gap-4 mt-6 ">
-          {DUMMY_DATA.map(expense => {
+          {DUMMY_DATA.map((expense) => {
             return (
-            <ExpenseCategoryItem
-            color={expense.color}
-            title={expense.title}
-            amount={expense.amount}
-            />
+              <ExpenseCategoryItem
+                key={expense.id}
+                color={expense.color}
+                title={expense.title}
+                total={expense.total}
+              />
             );
           })}
-         
-          
+        </div>
+      </section>
+
+      {/* Chart Section */}
+      <section className=" py-6 ">
+        <h3 className="text-2xl">Stats</h3>
+        <div className="w-1/2 mx-auto">
+          <Doughnut
+            data={{
+              labels: DUMMY_DATA.map((expense) => expense.title),
+              datasets: [
+                {
+                  label: "Expenses",
+                  data: DUMMY_DATA.map((expense) => expense.total),
+                  backgroundColor: DUMMY_DATA.map((expense) => expense.color),
+                  borderColor: ["#18181b"],
+                  borderWidth: 5,
+                },
+              ],
+            }}
+          />
         </div>
       </section>
     </main>
