@@ -46,14 +46,38 @@ const DUMMY_DATA = [
 ];
 
 export default function Home() {
-  const [modalIsOpen, setModalIsOpen] = useState(true);
+  const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
 
   return (
     <>
-      {/* Modal */}
+      {/* Add Income Modal */}
 
-      <Modal show={modalIsOpen} onClose={setModalIsOpen}>
-        <h3>Hello World/</h3>
+      <Modal show={showAddIncomeModal} onClose={setShowAddIncomeModal}>
+        <form className="flex flex-col gap-4">
+          <div className="input-group">
+            <label htmlFor="amount">Income Amount</label>
+            <input
+              type="number"
+              name="amount"
+              min={0.01}
+              step={0.01}
+              placeholder="Enter income amount"
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="description">Description</label>
+            <input
+              type="text"
+              name="description"
+              placeholder="Enter income description"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Add Entry
+          </button>
+        </form>
       </Modal>
 
       <main className="container max-w-2xl px-6 py-6 mx-auto">
@@ -61,15 +85,17 @@ export default function Home() {
           <small className="text-gray-400 text-md">My Balance</small>
           <h2 className="text-4xl font-bold">{currencyFormatter(100000)}</h2>
           <section className=" flex items-center gap-2 py-3 ">
-            <button
-              onClick={() => {
-                setModalIsOpen(true);
-              }}
-              className="btn btn-primary"
-            >
+            <button onClick={() => {}} className="btn btn-primary">
               + Expenses
             </button>
-            <button className="btn btn-primary-outline">+ Income</button>
+            <button
+              onClick={() => {
+                setShowAddIncomeModal(true);
+              }}
+              className="btn btn-primary-outline"
+            >
+              + Income
+            </button>
           </section>
         </section>
 
