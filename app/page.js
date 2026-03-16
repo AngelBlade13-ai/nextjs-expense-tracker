@@ -2,7 +2,9 @@
 
 import { useContext, useEffect, useState } from "react";
 
+import SignIn from "@/Components/SignIn";
 import { currencyFormatter } from "@/lib/utils";
+import { AuthContext } from "@/lib/store/auth-context";
 import { FinanceContext } from "@/lib/store/finance-context";
 
 import ExpenseCategoryItem from "@/Components/ExpenseCategoryItem";
@@ -15,6 +17,7 @@ import { Doughnut } from "react-chartjs-2";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Home() {
+  const { user, loading } = useContext(AuthContext);
   const { income, expenses } = useContext(FinanceContext);
   const [balance, setBalance] = useState(0);
   const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
@@ -32,6 +35,18 @@ export default function Home() {
 
     setBalance(newBalance);
   }, [income, expenses]);
+
+  if (loading) {
+    return (
+      <main className="container max-w-2xl px-6 py-12 mx-auto text-center text-slate-300">
+        Loading...
+      </main>
+    );
+  }
+
+  if (!user && loading === false) {
+    return <SignIn />;
+  }
 
   return (
     <>
@@ -83,6 +98,7 @@ export default function Home() {
 
         {/* Chart Section */}
         <section className=" py-6 ">
+          <a id="stats" />
           <h3 className="text-2xl">Stats</h3>
           <div className="w-1/2 mx-auto">
             <Doughnut

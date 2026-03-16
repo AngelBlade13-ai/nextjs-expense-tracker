@@ -2,6 +2,7 @@
 
 import { useContext } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { currencyFormatter } from "@/lib/utils";
 import { FinanceContext } from "@/lib/store/finance-context";
 import Modal from "@/Components/Modal";
@@ -23,8 +24,10 @@ function ViewExpenseModal({ show, onClose, expense }) {
       };
 
       await deleteExpenseItem(updatedExpense, expense.id);
+      toast.success("Expense item removed successfully");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -32,8 +35,10 @@ function ViewExpenseModal({ show, onClose, expense }) {
     try {
       await deleteExpenseCategory(expense.id);
       onClose(false);
+      toast.success("Expense category deleted successfully");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -52,12 +57,15 @@ function ViewExpenseModal({ show, onClose, expense }) {
 
       <div className="my-4 text-2xl">Expense History</div>
 
+      {(!expense.items || expense.items.length === 0) && (
+        <p className="text-sm text-slate-400">
+          No expense items in this category.
+        </p>
+      )}
+
       {expense.items?.map((item) => {
         return (
-          <div
-            key={item.id}
-            className="flex items-center justify-between"
-          >
+          <div key={item.id} className="flex items-center justify-between">
             <small>
               {item.createdAt?.toMillis
                 ? new Date(item.createdAt.toMillis()).toISOString()

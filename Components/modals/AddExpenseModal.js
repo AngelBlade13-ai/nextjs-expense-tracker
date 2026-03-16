@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useRef, useState } from "react";
+import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 import Modal from "@/Components/Modal";
 import { FinanceContext } from "@/lib/store/finance-context";
@@ -37,9 +38,12 @@ function AddExpenseModal({ show, onClose }) {
       await addExpenseItem(selectedCategory, newExpense);
       setExpenseAmount("");
       setSelectedCategory(null);
+      setShowAddExpense(false);
       onClose(false);
+      toast.success("Expense item added");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -47,9 +51,14 @@ function AddExpenseModal({ show, onClose }) {
     const title = titleRef.current.value;
     const color = colorRef.current.value;
 
+    if (!title.trim()) {
+      toast.error("Category title is required");
+      return;
+    }
+
     try {
       await addCategory({
-        title,
+        title: title.trim(),
         color,
         total: 0,
       });
@@ -57,13 +66,22 @@ function AddExpenseModal({ show, onClose }) {
       setShowAddExpense(false);
       titleRef.current.value = "";
       colorRef.current.value = "#22c55e";
+      toast.success("Category created");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
+  const closeAddExpenseModal = () => {
+    setExpenseAmount("");
+    setSelectedCategory(null);
+    setShowAddExpense(false);
+    onClose(false);
+  };
+
   return (
-    <Modal show={show} onClose={onClose}>
+    <Modal show={show} onClose={closeAddExpenseModal}>
       <div className="flex flex-col gap-4">
         <div>
           <label htmlFor="expense-amount">Enter an amount</label>
@@ -97,7 +115,7 @@ function AddExpenseModal({ show, onClose }) {
 
             {showAddExpense && (
               // This inline form creates brand-new expense categories on demand.
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <input
                   type="text"
                   placeholder="Enter title"

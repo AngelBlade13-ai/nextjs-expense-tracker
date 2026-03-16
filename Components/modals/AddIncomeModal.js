@@ -1,7 +1,9 @@
 "use client";
 
 import { useContext, useRef } from "react";
+import { toast } from "react-toastify";
 import { currencyFormatter } from "@/lib/utils";
+import { AuthContext } from "@/lib/store/auth-context";
 import { FinanceContext } from "@/lib/store/finance-context";
 import { FaRegTrashAlt } from "react-icons/fa";
 import Modal from "@/Components/Modal";
@@ -9,6 +11,7 @@ import Modal from "@/Components/Modal";
 function AddIncomeModal({ show, onClose }) {
   const amountRef = useRef();
   const descriptionRef = useRef();
+  const { user } = useContext(AuthContext);
   const ctx = useContext(FinanceContext);
   const { income, addIncomeItem, removeIncomeItem } = ctx;
 
@@ -20,27 +23,44 @@ function AddIncomeModal({ show, onClose }) {
       amount: +amountRef.current.value,
       description: descriptionRef.current.value,
       createdAt: new Date(),
+      uid: user.uid,
     };
 
     try {
       await addIncomeItem(newIncome);
       amountRef.current.value = "";
       descriptionRef.current.value = "";
+      toast.success("Income added successfully");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
   const deleteIncomeHandler = async (incomeId) => {
     try {
       await removeIncomeItem(incomeId);
+      toast.success("Income deleted successfully");
     } catch (error) {
       console.log(error.message);
+      toast.error(error.message);
     }
   };
 
+  const closeIncomeModal = () => {
+    if (amountRef.current) {
+      amountRef.current.value = "";
+    }
+
+    if (descriptionRef.current) {
+      descriptionRef.current.value = "";
+    }
+
+    onClose(false);
+  };
+
   return (
-    <Modal show={show} onClose={onClose}>
+    <Modal show={show} onClose={closeIncomeModal}>
       <form onSubmit={addIncomeHandler} className="flex flex-col gap-4">
         <div className="input-group">
           <label htmlFor="amount">Income Amount</label>
@@ -71,6 +91,10 @@ function AddIncomeModal({ show, onClose }) {
 
       <div className="flex flex-col px-6 mx-auto">
         <h3 className="text-2xl font-bold">Income History</h3>
+
+        {income.length === 0 && (
+          <p className="text-sm text-slate-400">No income entries yet.</p>
+        )}
 
         {income.map((incomeItem) => {
           return (
